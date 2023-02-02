@@ -37,10 +37,7 @@ The current study attempts to tackle the limitations of each approach highlighte
 
 This study focuses on the region (figure above) in California-Delta estuary where the 1D Advection-dispersion equation is applicable. Three stations are of interests as they align close to a line: Martinez at stations #359, Port Chicago at stations #358, and Chipps Island at #362. Outflow, as measured in cubic feet per second (CFS), and salinity, represented as electrical conductivity (EC) in micro-Siemens/cm (S/cm), are monitored at these stations. Outflow corresponds to the input of the model, and salinity the output of the model.
 
-Daily simulated Delta SimulationModel II (DSM2) outflow and salinity data during the period from 1 January 1991 to 31 December 2017 at these three stations are used for training and testing. Specifically, we consider two chronological-split schemes consisting of around 77% training and 22% testing:
-
-* Training: 1997-2017, Testing: 1991-1996
-* Training: 1991-2011, Testing: 2012-2017
+Daily simulated Delta SimulationModel II (DSM2) outflow and salinity data during the period from 1 January 1991 to 31 December 2017 at these three stations are used.
 
 ### Input (outflow) Preprocessing 
 
@@ -54,7 +51,7 @@ This study highlights the advantage of PINN to a fully-connected feedforward ari
 
 The ANN model consists of one input layer, two hidden layers, and one output layer. Input layer consits of 18 neurons, the number corresponding to the 18-dimensional outflow vectors. The model outputs a single value, an estimation to salinity. The general structure of the ANN model is illustrated in the below figure.
 
-![image](https://user-images.githubusercontent.com/91911643/210485984-27d2ac33-adae-47f0-ac75-baaaa9712840.png)
+<img width="615" alt="ANN" src="https://user-images.githubusercontent.com/91911643/216418648-d1151653-0796-4a78-91d3-07fa230e4370.png">
 
 ANN is trained by minimizing the mean squared error 
 $$\sum_n\|\hat{S}_n-S_n\|^2$$ 
@@ -64,7 +61,7 @@ The PINN model has the same neural network structure as the ANN model, except th
 $$A\frac{\partial S}{\partial t}-Q\frac{\partial S}{\partial x}=KA\frac{\partial^2 S}{\partial x^2}$$
 where $A$ is a constant representing cross-sectional area and $K$ is a constant representing dispersion coefficient. The general structure of the PINN model is illustrated in the below figure.
 
-![image](https://user-images.githubusercontent.com/91911643/210486455-99919956-3143-4249-af33-8b4700303d6d.png) 
+<img width="585" alt="PINN_st" src="https://user-images.githubusercontent.com/91911643/216418690-c7346457-7fa8-4e55-b287-84a235dba3ff.png">
 
 PINN is trained by minimizing the sum of the mean squared error and the PDE loss
 $$\sum_n\|\hat{S}_n-S_n\|^2 +\sum_n\bigg\|A\frac{\partial \hat{S}}{\partial t}\Bigr|\_{(x_n,t_n)}-\vec{Q}\_{n,1}\frac{\partial \hat{S}}{\partial x}\Bigr|\_{(x_n,t_n)}-KA\frac{\partial^2 \hat{S}}{\partial x^2}\Bigr|\_{(x_n,t_n)}\bigg\|^2$$
@@ -80,7 +77,12 @@ Both the ANN model and the PINN model are trained with the Adam optimization alg
 
 Experiments are carried out using Python on a public platform, the Google Colaboratory. The ANN model is trained using TensorFlow [3] and the PINN model is trained using DeepXDE package [4].
 
-## Results
+## Results (Chronological Split)
+
+We consider two chronological-split schemes consisting of around 77% training and 22% testing:
+
+* Training: 1997-2017, Testing: 1991-1996
+* Training: 1991-2011, Testing: 2012-2017
 
 The time-series plots of the estimated salinity in comparison to the target salinity are presented at three considered locations Martinez, Port Chicago, and Chipps Island. For the sake of space, only the plots at Martinez are shown on this page. See the file PINN_vs_ANN_Chrono_split.ipynb for the time-series plots at all three locations. 
 
@@ -113,6 +115,21 @@ At Martinez (Testing)
 ![image](https://user-images.githubusercontent.com/91911643/210493492-df1e7507-5aea-4d15-a440-75adfd934f0b.png)
 
 ![image](https://user-images.githubusercontent.com/91911643/210493535-b5148bd3-2c86-4c65-952b-93d9902b3fa0.png)
+
+## Results (5-fold)
+
+We conduct 5-fold Cross-Validation on 25 years of DSM2-simulated data from 1991-2015. For each fold, optimal hyperparameters were pre-computed separately for ANN and PINN.
+
+The following scatter plots show evalutation results of PINN vs. ANN for each fold and each location. Smaller Bias indicates better performance, i.e., PINN performed better than ANN for dots above the dotted line; larger NSE indicates better performance, i.e., PINN performed better than ANN for dots belowe the dotted line.
+
+<img width="400" alt="BiasM+P+C_test (Best)" src="https://user-images.githubusercontent.com/91911643/216421972-44377843-dedd-4575-b543-cf58460ac5b5.png"> <img width="400" alt="NSEM+P+C_test (Best)" src="https://user-images.githubusercontent.com/91911643/216421987-7af53867-f4a4-44c2-b77a-6ce927d7d5ac.png">
+
+Below are a couple of time-series plots illustrating the improvement of using PINN over ANN. For all time-series plots, see the file 5_fold_Results_&_Plots.ipynb.
+
+![fourth_Martinez_test (Best)](https://user-images.githubusercontent.com/91911643/216424571-087c0fbe-4bde-477e-8ef2-fd5eba17aa82.png)
+
+![fifth_Port Chicago_test (Best)](https://user-images.githubusercontent.com/91911643/216424581-e43bac3a-3054-4f37-9106-33f2371464de.png)
+
 
 # References
 
