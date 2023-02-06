@@ -2,6 +2,8 @@
 
 Study on salinity modeling in California-Delta estuary by Physics-informed neural networks (PINN).
 
+* All .ipynb files are best viewed in Colab.
+
 ## Introduction
 
 ### Importance of Salinity Modeling
